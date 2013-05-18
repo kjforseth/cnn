@@ -9,7 +9,8 @@ for n = 1:length(net)
             for m = 1:net{n}.kernNum
                 convInd = find(net{n}.convMap(m,:)); % find which feature maps from previous layer to accumulate
                 for o = convInd
-                    Y{m} = Y{m} + conv2(net{n-1}.X{o},rot90(net{n}.W{m,o},2),'valid') + net{n}.B{m};
+%                     Y{m} = Y{m} + conv2(net{n-1}.X{o},rot90(net{n}.W{m,o},2),'valid') + net{n}.B{m};
+                    Y{m} = Y{m} + conv2(net{n-1}.X{o},net{n}.W{m,o},'valid') + net{n}.B{m};
                 end
             end
             net{n}.X = Y; % linear tFcn for all conv layers
@@ -20,7 +21,8 @@ for n = 1:length(net)
                 else
                     X = net{n-1}.X{m};
                 end
-                S = conv2(X,ones(net{n}.sub)/(net{n}.sub^2),'valid');
+%                 S = conv2(X,ones(net{n}.sub)/(net{n}.sub^2),'valid');
+                S = conv2(X,ones(net{n}.sub),'valid'); % unnormalized by size of subsampling kernel
                 net{n}.S{m} = S(1:net{n}.sub:end,1:net{n}.sub:end);
                 net{n}.Y{m} = net{n}.S{m}*net{n}.W{m}+net{n}.B{m};
                 net{n}.X{m} = net{n}.tFcn(net{n}.Y{m});

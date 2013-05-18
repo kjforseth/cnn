@@ -233,10 +233,11 @@ for n = 1:gen.numLayers
     net{n}.dEdY{1} = 0;
     net{n}.dYdW{1} = 0;
     net{n}.dYdB{1} = 0;
-%     net{n}.H{1} = 0;
-%     net{n}.lam = 0;
-%     net{n}.dEdXold{1} = 0;
 end
+
+
+%% validate network
+% debug_flag = convnn_debug(X,Y,net,gen,params);
 
 %% train network
 % initialize

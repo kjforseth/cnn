@@ -16,9 +16,11 @@ for n = length(net):-1:2 % skip first dummy layer
             for m = 1:net{n}.kernNum
                 convInd = find(net{n}.convMap(m,:)); % find which feature maps from previous layer to accumulate
                 for o = convInd
-                    dEdW{m,o} = dEdW{m,o} + conv2(net{n-1}.X{o},rot90(net{n}.dEdY{m},2),'valid');
+%                     dEdW{m,o} = dEdW{m,o} + conv2(net{n-1}.X{o},rot90(net{n}.dEdY{m},2),'valid');
+                    dEdW{m,o} = dEdW{m,o} + rot90(conv2(net{n-1}.X{o},rot90(net{n}.dEdY{m},2),'valid'),2);
                     dEdB{m} = dEdB{m} + sum(net{n}.dEdY{m}(:));
-                    dEdX{o} = dEdX{o} + conv2(net{n}.W{m,o},net{n}.dEdY{m},'full');
+%                     dEdX{o} = dEdX{o} + conv2(net{n}.W{m,o},net{n}.dEdY{m},'full');
+                    dEdX{o} = dEdX{o} + conv2(net{n}.dEdY{m},rot90(net{n}.W{m,o},2),'full');
                 end
             end
             net{n}.dEdW = dEdW;
@@ -50,8 +52,9 @@ for n = length(net):-1:2 % skip first dummy layer
                 net{n}.dEdW{m} = sum(net{n}.dEdY{m}(:).*net{n}.S{m}(:));
                 net{n}.dEdB{m} = sum(net{n}.dEdY{m}(:));
                 
-                dEdX = conv2(upsample(upsample(net{n}.dEdY{m}.*net{n}.W{m},net{n}.sub)',net{n}.sub),ones(net{n}.sub),'full')'; % unnormalized by size of kernel?
-                net{n-1}.dEdX{m} = dEdX(1:end-net{n}.sub+1,1:end-net{n}.sub+1);
+%                 dEdX = conv2(upsample(upsample(net{n}.dEdY{m}.*net{n}.W{m},net{n}.sub)',net{n}.sub),ones(net{n}.sub),'full')'; % unnormalized by size of kernel?
+%                 net{n-1}.dEdX{m} = dEdX(1:end-net{n}.sub+1,1:end-net{n}.sub+1);
+                net{n-1}.dEdX{m} = kron(net{n}.dEdY{m}.*net{n}.W{m},ones(net{n}.sub));
             end
             
             numW = net{n}.FMapsNum;
